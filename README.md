@@ -1,0 +1,1 @@
+﻿# CHEQ Enforce CMP template for Google Tag Manager
