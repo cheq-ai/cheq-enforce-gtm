@@ -1,5 +1,11 @@
 homepage: "https://cheq.ai/enforce/"
-documentation: "https://help.ensighten.com/hc/en-us/categories/22778795168401-Privacy"
+documentation: "https://help.ensighten.com/hc/en-us/articles/33842399431313-Implementation-with-Google-Tag-Manager"
 versions:
+  # Latest version
+  - sha: 996326b96d1bb48f878b8c98289cd92222850c8f
+    changeNotes: |2
+      Updated documentation link.
+      Ensured account and publish path are enclosed in the encodeUri function.
+  # Older versions
   - sha: d7ac0806bddfe4266dcd5b93979930819dd4660f
     changeNotes: Initial version
