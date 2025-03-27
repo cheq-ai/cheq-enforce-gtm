@@ -45,7 +45,6 @@ const queryPermission = require('queryPermission');
 const injectScript = require('injectScript');
 const encodeUri = require('encodeUri');
 
-if (!data.hostname) return data.gtmOnFailure();
 if (!data.account) return data.gtmOnFailure();
 if (!data.publish_path) return data.gtmOnFailure();
 
