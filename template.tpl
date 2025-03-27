@@ -1,11 +1,3 @@
-﻿___TERMS_OF_SERVICE___
-
-By creating or modifying this file you agree to Google Tag Manager's Community
-Template Gallery Developer Terms of Service available at
-https://developers.google.com/tag-manager/gallery-tos (or such other URL as
-Google may provide), as modified from time to time.
-
-
 ___INFO___
 
 {
@@ -14,7 +6,9 @@ ___INFO___
   "version": 1,
   "securityGroups": [],
   "displayName": "CHEQ Enforce",
-  "categories": ["TAG_MANAGEMENT"],
+  "categories": [
+    "TAG_MANAGEMENT"
+  ],
   "brand": {
     "id": "cheq.ai",
     "displayName": "CHEQ",
@@ -49,12 +43,13 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 const queryPermission = require('queryPermission');
 const injectScript = require('injectScript');
+const encodeUri = require('encodeUri');
 
 if (!data.hostname) return data.gtmOnFailure();
 if (!data.account) return data.gtmOnFailure();
 if (!data.publish_path) return data.gtmOnFailure();
 
-const script = 'https://nexus.ensighten.com/' + data.account + '/' + data.publish_path + '/Bootstrap.js';
+const script = 'https://nexus.ensighten.com/' + encodeUri(data.account) + '/' + encodeUri(data.publish_path) + '/Bootstrap.js';
 if (queryPermission('inject_script', script)) {
   injectScript(script, data.gtmOnSuccess, data.gtmOnFailure);
 }
@@ -100,5 +95,3 @@ scenarios: []
 ___NOTES___
 
 Created on 3/6/2025, 3:23:22 PM
-
-
