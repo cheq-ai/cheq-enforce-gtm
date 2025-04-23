@@ -1,11 +1,9 @@
 homepage: "https://cheq.ai/enforce/"
 documentation: "https://help.ensighten.com/hc/en-us/articles/33842399431313-Implementation-with-Google-Tag-Manager"
 versions:
-  # Latest version
+  - sha: 2e46464291675731b8c00720ccf7ac2f5ff6f94f
+    changeNotes: Added the ability to set region-specific consent for Google Consent Mode
   - sha: 996326b96d1bb48f878b8c98289cd92222850c8f
-    changeNotes: |2
-      Updated documentation link.
-      Ensured account and publish path are enclosed in the encodeUri function.
-  # Older versions
+    changeNotes: Updated documentation link and ensured account and publish path are enclosed in the encodeUri function.
   - sha: d7ac0806bddfe4266dcd5b93979930819dd4660f
     changeNotes: Initial version
