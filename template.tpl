@@ -35,18 +35,235 @@ ___TEMPLATE_PARAMETERS___
     "name": "publish_path",
     "displayName": "Publish Path",
     "simpleValueType": true
+  },
+  {
+    "type": "PARAM_TABLE",
+    "name": "region_specific_consent",
+    "displayName": "Region-Specific Default Consent Overrides",
+    "paramTableColumns": [
+      {
+        "param": {
+          "type": "TEXT",
+          "name": "region",
+          "displayName": "Region Code(s)",
+          "simpleValueType": true,
+          "valueHint": "US-CA,GB,SK",
+          "textAsList": false,
+          "help": "A comma-delimited list of region codes specifying which region the consent settings apply to. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format.",
+          "valueValidators": [
+            {
+              "type": "NON_EMPTY"
+            }
+          ]
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_personalization",
+          "displayName": "ad_personalization",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_storage",
+          "displayName": "ad_storage",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_user_data",
+          "displayName": "ad_user_data",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "analytics_storage",
+          "displayName": "analytics_storage",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "functionality_storage",
+          "displayName": "functionality_storage",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "personalization_storage",
+          "displayName": "personalization_storage",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "security_storage",
+          "displayName": "security_storage",
+          "selectItems": [
+            {
+              "value": "default",
+              "displayValue": "Default"
+            },
+            {
+              "value": "granted",
+              "displayValue": "Granted"
+            },
+            {
+              "value": "denied",
+              "displayValue": "Denied"
+            }
+          ],
+          "simpleValueType": true,
+          "defaultValue": "default"
+        },
+        "isUnique": false
+      }
+    ],
+    "newRowButtonText": "Add region-specific default",
+    "newRowTitle": "Add region-specific default",
+    "help": "If you would like to have different default consent rules per region, you can enter those defaults here. Any region that is not defined will automatically take the global default set in the previous section."
   }
 ]
 
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-const queryPermission = require('queryPermission');
-const injectScript = require('injectScript');
 const encodeUri = require('encodeUri');
+const gtagSet = require('gtagSet');
+const injectScript = require('injectScript');
+const Object = require('Object');
+const queryPermission = require('queryPermission');
+const setDefaultConsentState = require('setDefaultConsentState');
 
 if (!data.account) return data.gtmOnFailure();
 if (!data.publish_path) return data.gtmOnFailure();
+
+gtagSet('developer_id.dNjQwYj', true);
+(data.region_specific_consent || []).forEach((region_consent) => {
+  if (region_consent.region) {
+    const parsed_region = region_consent.region.split(',').map(item => item.trim().toUpperCase());
+    const consent_state = {};
+    consent_state.region = parsed_region;
+    
+    Object.entries(region_consent).forEach((params) => {
+      const key = params[0];
+      const value = params[1];
+      if ((key !== 'region') && (value !== 'default')) {
+        consent_state[key] = value;
+      }
+    });
+
+    setDefaultConsentState(consent_state);
+  }
+});
 
 const script = 'https://nexus.ensighten.com/' + encodeUri(data.account) + '/' + encodeUri(data.publish_path) + '/Bootstrap.js';
 if (queryPermission('inject_script', script)) {
@@ -80,6 +297,255 @@ ___WEB_PERMISSIONS___
     },
     "clientAnnotations": {
       "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "access_consent",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "consentTypes",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "analytics_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "functionality_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "personalization_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "security_storage"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_personalization"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_user_data"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "write_data_layer",
+        "versionId": "1"
+      },
+      "param": []
     },
     "isRequired": true
   }
